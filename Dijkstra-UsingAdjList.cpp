@@ -2,132 +2,124 @@
 #include <map>
 #include <list>
 #include <set>
-#include <climits> 
-#include <time.h>
+#include <climits>
 #include <chrono>
-#include <cstdlib> 
-
+#include <cstdlib>
+#include <tuple>
+#include <vector>
+//author Tarik Velic
 using namespace std;
 
-template <typename T> 
 class Graph
-{								  
-	map<T, list<pair<T, int>>> l; 
+{
+    map<int, list<tuple<int, double>>> l;
 
-public: 
-	void addEdge(T x, T y, int wt)
-	{ 
-		l[x].push_back({y, wt});
-		//l[y].push_back({x, wt}); // to make the graph unidirectional just remove this line
-	}
+public:
+    void dodajGranu(int x, int y, double wt)
+    {
+        l[x].push_back(make_tuple(y, wt));
+        if (l.find(y) == l.end())
+        {
+            l[y] = list<tuple<int, double>>();
+        }
+    }
 
-	/*void print() {
-		for (auto p : l) {
-			T node = p.first;
-			cout << node << " -> ";
+    void print()
+    {
+        for (auto it = l.begin(); it != l.end(); ++it)
+        {
+            int cvor = it->first;
+            cout << cvor << " -> ";
+            for (auto susjedIt = it->second.begin(); susjedIt != it->second.end(); ++susjedIt)
+            {
+                int susjedniCvor;
+                double susjednaGrana;
+                tie(susjedniCvor, susjednaGrana) = *susjedIt;
+                cout << "(" << susjedniCvor << "," << susjednaGrana << ") ";
+            }
+            cout << endl;
+        }
+    }
 
-			for (auto nbr : l[node]) {
-				cout << "(" << nbr.first << "," << nbr.second << ") ";
-			} cout << endl;
-		}
-	}*/
+    void dijkstra(int src)
+    {
+        int V = l.size();
+        vector<double> udaljenost(V, numeric_limits<double>::max());
+        vector<bool> posjecen(V, false);
 
-	void print()
-	{
-		for (auto it = l.begin(); it != l.end(); ++it)
-		{
-			T node = it->first;
-			cout << node << " -> ";
-			for (auto nbrIt = l[node].begin(); nbrIt != l[node].end(); ++nbrIt)
-			{
-				cout << "(" << nbrIt->first << "," << nbrIt->second << ") ";
-			}
-			cout << endl;
-		}
-	}
+        udaljenost[src] = 0;
 
-	void djikstraSSSP(T src)
-	{
+        for (int i = 0; i < V - 1; ++i)
+        {
+            int u = minUdaljenost(udaljenost, posjecen);
+            posjecen[u] = true;
 
-		map<T, int> dist;
+            for (const auto &susjed : l[u])
+            {
+                int v = get<0>(susjed);
+                double weight = get<1>(susjed);
 
-		for (auto p : l)
-		{
-			T node = p.first;
-			dist[node] = INT_MAX;
-		}
-		dist[src] = 0;
+                if (!posjecen[v] && udaljenost[u] != numeric_limits<double>::max() &&
+                    udaljenost[u] + weight < udaljenost[v])
+                {
+                    udaljenost[v] = udaljenost[u] + weight;
+                }
+            }
+        }
 
-		set<pair<int, T>> s;
-		s.insert({dist[src], src});
+        /*for (int i = 0; i < V; ++i)
+        {
+            cout << "Node " << i << " is at udaljenostance " << udaljenost[i] << " from source" << endl;
+        }*/
+    }
 
-		while (!s.empty())
-		{
+    // Pomoćna funkcija za pronalaženje čvora s najmanjom udaljenošću
+    int minUdaljenost(const vector<double> &udaljenost, const vector<bool> &posjecen)
+    {
+        double min = numeric_limits<double>::max();
+        int min_index = -1;
 
-			pair<int, T> p = *s.begin(); 
-			s.erase(s.begin());
-			T currNode = p.second;
-			int currNodeDist = p.first;
+        for (int v = 0; v < udaljenost.size(); ++v)
+        {
+            if (!posjecen[v] && udaljenost[v] <= min)
+            {
+                min = udaljenost[v];
+                min_index = v;
+            }
+        }
 
-			for (auto nbr : l[currNode])
-			{ 
-				T nbrNode = nbr.first;
-				int distInBetween = nbr.second;
-				int nbrNodeDist = dist[nbrNode];
-				if (currNodeDist + distInBetween < nbrNodeDist)
-				{
-
-					auto pr = s.find({dist[nbrNode], nbrNode});
-					if (pr != s.end())
-					{
-						s.erase(pr);
-					}
-					dist[nbrNode] = currNodeDist + distInBetween;
-					s.insert({dist[nbrNode], nbrNode});
-				}
-			}
-		}
-
-		/*for (auto x : dist) {
-			cout << x.first << " is at distance " << x.second << " from source" << endl;
-		}*/
-		/*for (auto it = dist.begin(); it != dist.end(); ++it)
-		{
-			cout << it->first << " is at distance " << it->second << " from source" << endl;
-		}*/
-	}
+        return min_index;
+    }
 };
 
 int main()
 {
+    srand(time(0)); 
 
-	srand(time(0)); // Inicijalizacija generatora slučajnih brojeva
+    Graph g;
+    for (int i = 0; i < 1000; ++i)
+    {
+        for (int j = 0; j < 1000; ++j)
+        {
+            if (i != j)
+            {
+                if (rand() % 100 < 90)
+                {
+                    double weight = 5 + rand() % 99;
+                    g.dodajGranu(i, j, weight);
+                }
+            }
+        }
+    }
 
-	Graph<int> g; // Sada kreiramo instancu Graph klase koja radi sa int tipom
-	for (int i = 0; i < 1000; ++i)
-	{
-		for (int j = 0; j < 1000; ++j)
-		{
-			if (i != j)
-			{ 
-				if (rand() % 100 < 30)
-				{ // 30% šansa da se stvori grana
-					 int weight = 5 + rand() % 99; // Generiše težinu između 5 i 100
-					g.addEdge(i, j, weight);
-				}
-			}
-		}
-	}
+    cout << endl;
+    auto start = std::chrono::high_resolution_clock::now();
 
-	//g.print();
-	cout << endl;
-	auto start = std::chrono::high_resolution_clock::now();
+    g.dijkstra(0);
 
-	g.djikstraSSSP(0);
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+    cout << "Vrijeme izvršavanja: " << duration.count() << " miliseconds" << endl;
 
-	auto stop = std::chrono::high_resolution_clock::now();
-	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
-	std::cout << "Vrijeme izvršavanja: " << duration.count() << " miliseconds" << std::endl;
-   // g.print();
-	cout << endl;
+    return 0;
 }

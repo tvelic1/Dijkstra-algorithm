@@ -2,92 +2,89 @@
 #include <vector>
 #include <limits>
 #include <chrono>
-#include <cstdlib> // Za rand() i srand()
+#include <cstdlib> 
 #include <queue>
 using namespace std;
-
-template<typename T, int V>
-class Graph {
+//ovaj
+class Graph
+{
     // Lista susjedstva gdje svaki par sadrži čvor susjeda i težinu grane
-    vector<vector<pair<T, int>>> adjList;
+    vector<vector<pair<int, double>>> listaSusjedstva;
+    int brojCvorova;
 
 public:
-    Graph() : adjList(V) {}
-
-    void addEdge(T x, T y, int wt) {
-        // Dodajemo granu od x do y s težinom wt
-        adjList[x].push_back(make_pair(y, wt));
-        // Za neusmjereni graf, odkomentirajte sljedeću liniju
-        // adjList[y].push_back(make_pair(x, wt));
+    Graph(int V)
+    {
+        listaSusjedstva = vector<vector<pair<int, double>>>(V);
+        brojCvorova = V;
     }
 
-    void print() {
-        for (int i = 0; i < V; ++i) {
+    void dodajGranu(int x, int y, double wt)
+    {
+        // Dodajemo granu od x do y s težinom wt
+        listaSusjedstva[x].push_back(make_pair(y, wt));
+        // Za neusmjereni graf, odkomentirajte sljedeću liniju
+         listaSusjedstva[y].push_back(make_pair(x, wt));
+    }
+
+      void print()
+    {
+        for (int i = 0; i < brojCvorova; ++i)
+        {
             cout << i << " -> ";
-            for (auto &p : adjList[i]) {
-                cout << "(" << p.first << "," << p.second << ") ";
+            for (int j = 0; j < listaSusjedstva[i].size(); ++j)
+            {
+                cout << "(" << listaSusjedstva[i][j].first << "," << listaSusjedstva[i][j].second << ") ";
             }
             cout << endl;
         }
     }
 
-    void dijkstraSSSP(T src) {
-        vector<int> dist(V, numeric_limits<int>::max());
-        dist[src] = 0;
+    void dijkstra(int izvor)
+    {
+        vector<int> udaljenost(brojCvorova, numeric_limits<int>::max());
+        udaljenost[izvor] = 0;
 
-        priority_queue<pair<int, T>, vector<pair<int, T>>, greater<pair<int, T>>> pq;
-        pq.push({0, src});
+        priority_queue<pair<double, int>, vector<pair<double, int>>, greater<pair<double, int>>> pq;
+        pq.push({0, izvor});
 
-        while (!pq.empty()) {
-            T currNode = pq.top().second;
+        while (!pq.empty())
+        {
+            int trenutniCvor = pq.top().second;
             pq.pop();
 
-            for (auto nbr : adjList[currNode]) {
-                T nbrNode = nbr.first;
-                int edgeDist = nbr.second;
+            for (auto it = listaSusjedstva[trenutniCvor].begin(); it != listaSusjedstva[trenutniCvor].end(); ++it)
+            {
+                int susjedniCvor = it->first;
+                int susjednaGrana = it->second;
 
-                if (dist[currNode] + edgeDist < dist[nbrNode]) {
-                    dist[nbrNode] = dist[currNode] + edgeDist;
-                    pq.push(make_pair(dist[nbrNode], nbrNode));
+                if (udaljenost[trenutniCvor] + susjednaGrana < udaljenost[susjedniCvor])
+                {
+                    udaljenost[susjedniCvor] = udaljenost[trenutniCvor] + susjednaGrana;
+                    pq.push(make_pair(udaljenost[susjedniCvor], susjedniCvor));
                 }
             }
         }
 
         // Za ispis udaljenosti od izvora do svakog čvora, odkomentirajte sljedeći blok
-        /*
-        for (int i = 0; i < V; ++i) {
-            cout << i << " is at distance " << dist[i] << " from source" << endl;
+        
+        for (int i = 0; i < brojCvorova; ++i) {
+            cout << i << " je na udaljenosti " << udaljenost[i] << " od izvora" << endl;
         }
-        */
+        
     }
 };
 
-int main() {
-    srand(time(0)); // Inicijalizacija generatora slučajnih brojeva
-
-    const int V = 1000;  // Broj vrhova u grafu
-    Graph<int,V> g;
-    for (int i = 0; i < 1000; ++i) {
-        for (int j = 0; j < 1000; ++j) {
-            if (i != j ) { 
-                int slucajniBroj = rand() % 100; // Generiše broj između 0 i 99
-                if (slucajniBroj < 70) { // 70% šansa
-                    int weight = 5 + rand() % 99; // Generiše težinu između 5 i 99
-                    g.addEdge(i, j, weight);
-                }
-            }
-        }
-    }
-
-    //g.print();
-    cout << endl;
-    auto start = std::chrono::high_resolution_clock::now();
-
-    g.dijkstraSSSP(0);
-    auto stop = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
-    cout << "Vrijeme izvršavanja: " << duration.count() << " milisekundi" << endl;
+int main()
+{
+    Graph g(4);
+    g.dodajGranu(0, 1, 4);
+    g.dodajGranu(0, 2, 1);
+    g.dodajGranu(2, 1, 2);
+    g.dodajGranu(1, 3, 1);
+    g.dodajGranu(2, 3, 5);
+    g.print();
+    g.dijkstra(0);
 
     return 0;
 }
-

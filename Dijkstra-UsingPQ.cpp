@@ -5,7 +5,7 @@
 #include <cstdlib> 
 #include <queue>
 using namespace std;
-//ovaj
+//autor Tarik Velic
 class Graph
 {
     // Lista susjedstva gdje svaki par sadrži čvor susjeda i težinu grane
@@ -82,7 +82,7 @@ int main()
     g.dodajGranu(0, 2, 1);
     g.dodajGranu(2, 1, 2);
     g.dodajGranu(1, 3, 1);
-    g.dodajGranu(2, 3, 5);
+    g.dodajGranu(2, 3, 7);
     g.print();
     g.dijkstra(0);
 

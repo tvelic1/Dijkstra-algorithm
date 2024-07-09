@@ -67,10 +67,10 @@ public:
             }
         }
 
-        /*for (int i = 0; i < V; ++i)
+        for (int i = 0; i < V; ++i)
         {
-            cout << "Node " << i << " is at udaljenostance " << udaljenost[i] << " from source" << endl;
-        }*/
+            cout << "Čvor " << i << " je na udaljenosti " << udaljenost[i] << " od izvora" << endl;
+        }
     }
 
     // Pomoćna funkcija za pronalaženje čvora s najmanjom udaljenošću

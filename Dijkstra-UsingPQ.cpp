@@ -23,7 +23,7 @@ public:
     {
         // Dodajemo granu od x do y s težinom wt
         listaSusjedstva[x].push_back(make_pair(y, wt));
-        // Za neusmjereni graf, odkomentirajte sljedeću liniju
+        // Graf je neusmjeren
          listaSusjedstva[y].push_back(make_pair(x, wt));
     }
 
@@ -65,8 +65,6 @@ public:
                 }
             }
         }
-
-        // Za ispis udaljenosti od izvora do svakog čvora, odkomentirajte sljedeći blok
         
         for (int i = 0; i < brojCvorova; ++i) {
             cout << i << " je na udaljenosti " << udaljenost[i] << " od izvora" << endl;

@@ -41,13 +41,13 @@ public:
         }
     }
 
-    void dijkstra(int src)
+    void dijkstra(int izvor)
     {
         int V = l.size();
         vector<double> udaljenost(V, numeric_limits<double>::max());
         vector<bool> posjecen(V, false);
 
-        udaljenost[src] = 0;
+        udaljenost[izvor] = 0;
 
         for (int i = 0; i < V - 1; ++i)
         {

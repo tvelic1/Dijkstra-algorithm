@@ -7,7 +7,7 @@
 #include <cstdlib>
 #include <tuple>
 #include <vector>
-//author Tarik Velic
+//autor Tarik Velic
 using namespace std;
 
 class Graph
@@ -57,12 +57,12 @@ public:
             for (const auto &susjed : l[u])
             {
                 int v = get<0>(susjed);
-                double weight = get<1>(susjed);
+                double tezina = get<1>(susjed);
 
                 if (!posjecen[v] && udaljenost[u] != numeric_limits<double>::max() &&
-                    udaljenost[u] + weight < udaljenost[v])
+                    udaljenost[u] + tezina < udaljenost[v])
                 {
-                    udaljenost[v] = udaljenost[u] + weight;
+                    udaljenost[v] = udaljenost[u] + tezina;
                 }
             }
         }
@@ -105,8 +105,8 @@ int main()
             {
                 if (rand() % 100 < 90)
                 {
-                    double weight = 5 + rand() % 99;
-                    g.dodajGranu(i, j, weight);
+                    double tezina = 5 + rand() % 99999;
+                    g.dodajGranu(i, j, tezina);
                 }
             }
         }
